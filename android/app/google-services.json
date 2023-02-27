@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "207656839655",
+    "project_id": "parkspot-bdff3",
+    "storage_bucket": "parkspot-bdff3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:207656839655:android:b4d95df6fde69d28aab542",
+        "android_client_info": {
+          "package_name": "com.rm.parkspot.park_spot"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "207656839655-6lluoldfp7f65jnuqp35j6llsmqn1u8q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rm.parkspot.park_spot",
+            "certificate_hash": "8f2b42b94ca922334de665fbae62558d82a53cdd"
+          }
+        },
+        {
+          "client_id": "207656839655-f2ilcf3sl4qi5q58pce8mcq5qne4trfr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAONjehf51GgP-rX_lGrhABO1pGiXbYW54"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "207656839655-f2ilcf3sl4qi5q58pce8mcq5qne4trfr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
