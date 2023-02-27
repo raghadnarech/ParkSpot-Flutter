@@ -18,7 +18,6 @@ Future<void> main() async {
   final isloging = prefs.getBool('isLogged') ?? false;
   print(showLogin);
   print(isloging);
-
   runApp(MyApp(
     showLogin: showLogin,
     isLogging: isloging,

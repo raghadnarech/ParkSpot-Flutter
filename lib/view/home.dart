@@ -15,7 +15,6 @@ import 'package:park_spot/view/Auth/login.dart';
 import 'package:park_spot/view/splash.dart';
 import 'package:park_spot/view/userpage/history_booking.dart';
 import 'package:page_transition/page_transition.dart';
-
 import 'package:park_spot/view/userpage/park_now.dart';
 import 'package:park_spot/view/userpage/parking_now.dart';
 import 'package:park_spot/view/myvehicle_page.dart';
