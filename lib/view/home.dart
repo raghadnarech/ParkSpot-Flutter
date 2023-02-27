@@ -1,5 +1,4 @@
 import 'package:carousel_slider/carousel_slider.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/container.dart';
@@ -24,7 +23,6 @@ import 'package:park_spot/widget/list_tile_drarwer.dart';
 import 'package:provider/provider.dart';
 
 MapProvider? mapProvider;
-
 class HomePage extends StatelessWidget {
   HomePage({super.key});
 
