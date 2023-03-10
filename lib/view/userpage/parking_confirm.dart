@@ -363,7 +363,7 @@ class _Parking_ConfirmState extends State<Parking_Confirm> {
                                           fontWeight: FontWeight.w600),
                                     ),
                                     Text(
-                                      "10000 sp",
+                                      "${userProvider!.wallet!.amount} sp",
                                       style: TextStyle(
                                           color: kBaseColor, fontSize: 12),
                                     ),

@@ -10,7 +10,6 @@ import 'package:park_spot/view/home.dart';
 import 'package:park_spot/view/onboarding/onboarding.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Splash extends StatefulWidget {
   final bool showLogin;
@@ -83,7 +82,7 @@ class _SplashState extends State<Splash> {
     MapProvider mapProvider = Provider.of<MapProvider>(context);
     userProvider = Provider.of<UserProvider>(context);
     userProvider!.getUser();
-
+    userProvider!.getamount();
     mapProvider.checkPermissionAndGetLocation();
 
     return Scaffold(

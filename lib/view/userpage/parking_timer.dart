@@ -115,6 +115,42 @@ class Parking_Timer extends StatelessWidget {
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: kPrimaryColor),
                             child: Text("Extend Parking Time"),
+                            onPressed: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (_) {
+                                    return AlertDialog(title: Text(""));
+                                  });
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: kPrimaryColor),
+                            child: Text("Go To Map"),
+                            onPressed: () {},
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red),
+                            child: Text("End Park"),
                             onPressed: () {},
                           ),
                         ),
