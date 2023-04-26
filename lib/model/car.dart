@@ -1,8 +1,12 @@
 class Car {
-  int? id;
   String? Country;
-  String? NumCar;
+  int? NumCar;
   String? Type;
   String? Color;
-  Car({this.Color, this.Country, this.NumCar, this.Type, this.id});
+  Car({
+    this.Color,
+    this.Country,
+    this.NumCar,
+    this.Type,
+  });
 }

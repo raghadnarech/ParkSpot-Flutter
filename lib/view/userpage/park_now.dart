@@ -76,19 +76,16 @@ class _ParkNowState extends State<ParkNow> {
           i++) {
         final markeritem =
             mapProvider!.listZoneAndDirection![index].direction!.listpoint!;
-
         listlatlan.add(
             LatLng(markeritem.elementAt(i).Lat, markeritem.elementAt(i).Lon));
       }
       for (int i = 0; i < listlatlan.length; i++) {
         final ploylineitem = listlatlan[i];
-
         ploylinelist.add(Polyline(
             points: listlatlan,
             color: kPrimaryColor.withOpacity(0.03),
             strokeWidth: 5));
       }
-
       return ploylinelist;
     }
 
@@ -117,16 +114,17 @@ class _ParkNowState extends State<ParkNow> {
                   PolylineLayer(polylines: buildLine(currentpage)),
                   MarkerLayer(markers: [
                     Marker(
-                        point: LatLng(mapProvider!.lat, mapProvider!.lon),
-                        builder: ((context) {
-                          return FlutterRipple(
-                            radius: 20,
-                            child: Image.asset("image/icon/dot_location.png",
-                                width: 25),
-                            rippleColor: kPrimaryColor,
-                            duration: Duration(seconds: 2),
-                          );
-                        }))
+                      point: LatLng(mapProvider!.lat, mapProvider!.lon),
+                      builder: ((context) {
+                        return FlutterRipple(
+                          radius: 20,
+                          rippleColor: kPrimaryColor,
+                          duration: Duration(seconds: 2),
+                          child: Image.asset("image/icon/dot_location.png",
+                              width: 25),
+                        );
+                      }),
+                    )
                   ]),
                   MarkerLayer(markers: buildMarker()),
                 ],
@@ -196,11 +194,12 @@ class CardMarker extends StatelessWidget {
                           style: TextStyle(color: kBaseColor, fontSize: 18),
                         ),
                         onPressed: () {
-                          Navigator.push(
+                          Navigator.pushReplacement(
                               context,
                               PageTransition(
                                 type: PageTransitionType.fade,
                                 child: Parking_Confirm(
+                                    idpark: marker.id,
                                     parkname: marker.Location,
                                     parktype: marker.type),
                                 isIos: false,

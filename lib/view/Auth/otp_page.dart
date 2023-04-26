@@ -82,20 +82,29 @@ class _OtpPageState extends State<OtpPage> {
                           try {
                             // FirebaseAuth.instance.setSettings(
                             //     appVerificationDisabledForTesting: true);
-                            await FirebaseAuth.instance
-                                .signInWithCredential(
-                                    PhoneAuthProvider.credential(
-                                        verificationId: _verificationCode!,
-                                        smsCode: pin))
-                                .then((value) async {
-                              if (value.user != null) {
-                                Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => Register()),
-                                    (route) => true);
-                              }
-                            });
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Register(
+                                          phone: widget.phone,
+                                        )),
+                                (route) => false);
+                            // await FirebaseAuth.instance
+                            //     .signInWithCredential(
+                            //         PhoneAuthProvider.credential(
+                            //             verificationId: _verificationCode!,
+                            //             smsCode: pin))
+                            //     .then((value) async {
+                            //   if (value.user != null) {
+                            //     Navigator.pushAndRemoveUntil(
+                            //         context,
+                            //         MaterialPageRoute(
+                            //             builder: (context) => Register(
+                            //                   phone: widget.phone,
+                            //                 )),
+                            //         (route) => true);
+                            //   }
+                            // });
                           } catch (e) {
                             ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text(e.toString())));
@@ -164,7 +173,6 @@ class _OtpPageState extends State<OtpPage> {
     await FirebaseAuth.instance.verifyPhoneNumber(
         phoneNumber: '+963${widget.phone}',
         verificationCompleted: (PhoneAuthCredential credential) async {
-          print(credential.smsCode);
           await FirebaseAuth.instance
               .signInWithCredential(credential)
               .then((value) async {
@@ -192,10 +200,10 @@ class _OtpPageState extends State<OtpPage> {
         timeout: Duration(seconds: 120));
   }
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    _verifyPhone();
-  }
+  // @override
+  // void initState() {
+  //   // TODO: implement initState
+  //   super.initState();
+  //   _verifyPhone();
+  // }
 }

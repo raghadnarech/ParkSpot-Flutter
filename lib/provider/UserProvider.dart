@@ -11,7 +11,7 @@ class UserProvider with ChangeNotifier {
   bool _isLoading = false;
   List<Car> CarList = [];
   Car? car;
-  User _user = User();
+  User user = User();
   int _defaultcar = 0;
   Wallet? wallet;
 
@@ -22,38 +22,18 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  User get user => _user;
-  void setUser(User user) {
-    _user = user;
-    notifyListeners();
-  }
-
-  Future<void> saveUser(User user) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setInt('id', user.id!);
-    prefs.setString('name', user.name!);
-    prefs.setString('phone', user.phone!);
-    prefs.setString('password', user.password!);
-    notifyListeners();
-  }
-
   Future<void> getUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     int? id = prefs.getInt('id');
     String? name = prefs.getString('name');
     String? phone = prefs.getString('phone');
-    String? password = prefs.getString('password');
+    String? token = prefs.getString('token');
 
-    _user = User(
-      id: id,
-      name: name,
-      password: password,
-      phone: phone,
-    );
+    user = User(id: id, name: name, phone: phone, token: token);
     notifyListeners();
   }
 
-  void removeUser() async {
+  Future<void> removeUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('isLogged', false);
     prefs.remove('id');
@@ -62,56 +42,57 @@ class UserProvider with ChangeNotifier {
     prefs.remove('password');
   }
 
-  Future<String> getphone() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? phone = prefs.getString('phone');
-    return phone!;
-  }
-
   Future<void> getamount() async {
-    _isLoading = true;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
 
     http.Response response = await http.get(
-      Uri.parse('http://10.0.2.2:8000/api/getamount/${_user.id}'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
+      Uri.parse('http://10.0.2.2:8000/api/user/Get_Amount'),
+      headers: {
+        'Accept': 'application/json',
+        'api_key': '123456789',
+        'token': token!
       },
     );
     dynamic data = await json.decode(response.body);
 
-    print(data);
-    wallet = Wallet(amount: data);
+    // print(data);
+    wallet = Wallet(amount: data['data']);
 
     _isLoading = false;
-    print(wallet!.amount);
+    // print(wallet!.amount);
     notifyListeners();
   }
 
   Future<void> getallCar_user() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
     _isLoading = true;
     int i;
 
-    http.Response response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/api/allcars_user'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
+    http.Response response = await http.get(
+      Uri.parse('http://10.0.2.2:8000/api/user/Get_Cars_User'),
+      headers: {
+        'Accept': 'application/json',
+        'api_key': '123456789',
+        'token': token!
       },
-      body: await jsonEncode(<String, String>{'user_id': user.id.toString()}),
     );
     dynamic data = await json.decode(response.body);
+    dynamic cars = data['data'];
+    // print(cars);
     CarList = [];
 
-    for (i = 0; i < data.length; i++) {
+    for (i = 0; i < cars.length; i++) {
       car = Car(
-        id: data[i]['id'],
-        Color: data[i]['Color'],
-        Country: data[i]['Country'],
-        NumCar: data[i]['NumCar'],
-        Type: data[i]['Type'],
+        Color: cars[i]['color'],
+        Country: cars[i]['country'],
+        NumCar: cars[i]['num_car'],
+        Type: cars[i]['type'],
       );
 
       CarList.add(car!);
-      print(CarList);
+      // print(CarList);
     }
 
     _isLoading = false;
@@ -119,44 +100,48 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> register_car(
+  Future<String> register_car(
       String country, String numCar, String type, String color) async {
-    _isLoading = true;
-    // await Future.delayed(Duration(seconds: 10));
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
     http.Response response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/api/addcars'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
+      Uri.parse('http://10.0.2.2:8000/api/user/Create_Car'),
+      headers: {
+        'Accept': 'application/json',
+        'api_key': '123456789',
+        'token': token!
       },
-      body: await jsonEncode(<String, String>{
-        'Country': country,
-        'NumCar': numCar,
-        'Type': type,
-        'Color': color,
-        'user_id': user.id.toString()
-      }),
+      body: {
+        'country': country,
+        'num_car': numCar.toString(),
+        'type': type,
+        'color': color,
+      },
     );
-    print(color);
-    print(numCar);
-    print(type);
-    print(country);
-    // dynamic data = await jsonDecode(response.body);
-
-    _isLoading = false;
-
-    notifyListeners();
+    print(response.body);
+    dynamic data = jsonDecode(response.body);
+    print(data);
+    if (response.statusCode == 201) {
+      return '';
+    } else {
+      return data['msg'];
+    }
   }
 
-  Future<void> delete_car(int index) async {
+  Future<void> delete_car(String? country, String? num_car) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
     _isLoading = true;
 
-    http.Response response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/api/deletecar/${CarList[index].id}'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-    );
-
+    http.Response response = await http
+        .post(Uri.parse('http://10.0.2.2:8000/api/user/Delete_Car'), headers: {
+      'Accept': 'application/json',
+      'api_key': '123456789',
+      'token': token!
+    }, body: {
+      'country': country,
+      'num_car': num_car
+    });
     _isLoading = false;
 
     notifyListeners();

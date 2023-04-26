@@ -2,7 +2,7 @@ class Zone {
   int? id;
   String? type;
   String? busy_Capacity;
-  String? ac_capacity;
+  int? ac_capacity;
   String? Location;
   var Lat;
   var Lan;

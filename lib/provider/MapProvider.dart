@@ -13,11 +13,11 @@ import 'package:park_spot/model/position_opject.dart';
 import 'package:park_spot/model/zone.dart';
 import 'package:http/http.dart' as http;
 import 'package:park_spot/model/zone_and_direction.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MapProvider with ChangeNotifier {
   String baseUrl = 'https://api.mapbox.com/directions/v5/mapbox';
   bool showmarker = false;
-
   String navType = 'driving';
   List? geometry;
   num duration = 0;
@@ -33,10 +33,10 @@ class MapProvider with ChangeNotifier {
   ZoneAndDirection? zoneAndDirection;
   List<ZoneAndDirection>? listZoneAndDirection = [];
   MapController controller = MapController();
+
   Future<void> getLocation() async {
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-
     _myPosition = await PositionObject(position.latitude, position.longitude);
     _isLoading = false;
     notifyListeners();
@@ -61,30 +61,36 @@ class MapProvider with ChangeNotifier {
   }
 
   Future<void> getallZone() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
     int i;
     List<Zone> ZoneList = [];
     _isLoading = true;
     http.Response response = await http.get(
-      Uri.parse('http://10.0.2.2:8000/api/getallzone'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
+      Uri.parse('http://10.0.2.2:8000/api/user/Get_All_Zone'),
+      headers: {
+        'Accept': 'application/json',
+        'api_key': '123456789',
+        'token': token!
       },
     );
 
-    List<dynamic> data = await json.decode(response.body);
+    dynamic data = await json.decode(response.body);
+    dynamic zones = data['data'];
+    print(zones);
+
     ZonerList = [];
     listdirection = [];
     listZoneAndDirection = [];
     print(data.length);
-    for (i = 0; i < data.length; i++) {
+    for (i = 0; i < zones.length; i++) {
       zone = Zone(
-        id: data[i]['id'],
-        type: data[i]['Type'],
-        busy_Capacity: data[i]['busy_Capacity'],
-        ac_capacity: data[i]['ac_capacity'],
-        Location: data[i]['Location'],
-        Lat: data[i]['Lat'] as double,
-        Lan: data[i]['Lan'] as double,
+        id: zones[i]['id'],
+        type: zones[i]['type'],
+        ac_capacity: zones[i]['capacity'],
+        Location: zones[i]['name'],
+        Lat: zones[i]['lat'] as double,
+        Lan: zones[i]['lan'] as double,
       );
 
       ZonerList.add(zone!);

@@ -77,12 +77,19 @@ class SignupPage extends StatelessWidget {
                               backgroundColor: kPrimaryColor),
                           onPressed: () {
                             if (_globalKey.currentState!.validate()) {
-                              auth.setphone(phoneController.text);
+                              // Navigator.push(
+                              //     context,
+                              //     PageTransition(
+                              //       type: PageTransitionType.fade,
+                              //       child: Register(),
+                              //       isIos: false,
+                              //       duration: Duration(milliseconds: 300),
+                              //     ));
                               Navigator.push(
                                   context,
                                   PageTransition(
                                     type: PageTransitionType.fade,
-                                    child: Register(),
+                                    child: OtpPage(phone: phoneController.text),
                                     isIos: false,
                                     duration: Duration(milliseconds: 300),
                                   ));

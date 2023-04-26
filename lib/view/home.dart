@@ -8,6 +8,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:park_spot/const/constants.dart';
 import 'package:park_spot/main.dart';
 import 'package:park_spot/provider/AuthProvider.dart';
+import 'package:park_spot/provider/BookProvider.dart';
 import 'package:park_spot/provider/MapProvider.dart';
 import 'package:park_spot/provider/UserProvider.dart';
 import 'package:park_spot/view/Auth/login.dart';
@@ -17,7 +18,9 @@ import 'package:page_transition/page_transition.dart';
 import 'package:park_spot/view/userpage/park_now.dart';
 import 'package:park_spot/view/userpage/parking_now.dart';
 import 'package:park_spot/view/myvehicle_page.dart';
+import 'package:park_spot/view/userpage/parking_timer.dart';
 import 'package:park_spot/view/userpage/parknow_home.dart';
+import 'package:park_spot/view/userpage/walletpage.dart';
 import 'package:park_spot/widget/button_grid_home.dart';
 import 'package:park_spot/widget/list_tile_drarwer.dart';
 import 'package:provider/provider.dart';
@@ -34,6 +37,7 @@ class HomePage extends StatelessWidget {
     mapProvider = Provider.of<MapProvider>(context);
     authProvider = Provider.of<AuthProvider>(context);
     userProvider = Provider.of<UserProvider>(context);
+    bookProvider = Provider.of<BookProvider>(context);
     bool isChecked = false;
 
     return Scaffold(
@@ -117,67 +121,80 @@ class HomePage extends StatelessWidget {
                               width: double.infinity,
                               child: Padding(
                                 padding: const EdgeInsets.all(18.0),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Column(
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        PageTransition(
+                                          type: PageTransitionType.fade,
+                                          child: WalletPage(),
+                                          isIos: false,
+                                          duration: Duration(milliseconds: 300),
+                                        ));
+                                  },
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Column(
+                                            children: [
+                                              Icon(
+                                                Icons
+                                                    .account_balance_wallet_outlined,
+                                                size: 30,
+                                                color: kBaseColor,
+                                              ),
+                                            ],
+                                          ),
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "Wallat",
+                                                  style: TextStyle(
+                                                    color: kBaseColor,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "Quick Payment",
+                                                  style: TextStyle(
+                                                      color: kBaseColor,
+                                                      fontSize: 10),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height: height * 0.05,
+                                        child: Row(
                                           children: [
+                                            Text(
+                                                "\$${userProvider!.wallet!.amount}",
+                                                style: TextStyle(
+                                                    color: kBaseColor)),
+                                            SizedBox(
+                                              width: width * 0.02,
+                                            ),
                                             Icon(
-                                              Icons
-                                                  .account_balance_wallet_outlined,
-                                              size: 30,
+                                              Icons.arrow_forward_ios,
+                                              size: 20,
                                               color: kBaseColor,
                                             ),
                                           ],
                                         ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 10),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                "Wallat",
-                                                style: TextStyle(
-                                                  color: kBaseColor,
-                                                ),
-                                              ),
-                                              Text(
-                                                "Quick Payment",
-                                                style: TextStyle(
-                                                    color: kBaseColor,
-                                                    fontSize: 10),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: height * 0.05,
-                                      child: Row(
-                                        children: [
-                                          Text(
-                                              "\$${userProvider!.wallet!.amount}",
-                                              style:
-                                                  TextStyle(color: kBaseColor)),
-                                          SizedBox(
-                                            width: width * 0.02,
-                                          ),
-                                          Icon(
-                                            Icons.arrow_forward_ios,
-                                            size: 20,
-                                            color: kBaseColor,
-                                          ),
-                                        ],
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -231,6 +248,7 @@ class HomePage extends StatelessWidget {
                                       color: kPrimaryColor, size: 30),
                                   title: Text("Logout"),
                                   onTap: () async {
+                                    await userProvider!.removeUser();
                                     Navigator.pushReplacement(
                                         context,
                                         PageTransition(
@@ -239,7 +257,6 @@ class HomePage extends StatelessWidget {
                                           isIos: false,
                                           duration: Duration(milliseconds: 300),
                                         ));
-                                    userProvider!.removeUser();
                                   },
                                 ),
                               ]),
@@ -315,23 +332,46 @@ class HomePage extends StatelessWidget {
                   ButtonGridHome(
                     image: "image/spaces.png",
                     title: "Park Now",
-                    navigator: ParkingNow(),
+                    onTap: () async {
+                      userProvider!.getallCar_user();
+                      mapProvider!.getallZone();
+                      Navigator.push(
+                          context,
+                          PageTransition(
+                            type: PageTransitionType.fade,
+                            child: ParkingNow(),
+                            isIos: false,
+                            duration: Duration(milliseconds: 300),
+                          ));
+                    },
                   ),
                   ButtonGridHome(
-                    image: "image/spaces1.png",
-                    title: "Park On Street",
-                    navigator: ParkingHome(),
-                  ),
-                  ButtonGridHome(
-                    image: "image/spaces.png",
-                    title: "Park On Street",
-                    navigator: HomePage(),
-                  ),
-                  ButtonGridHome(
-                    image: "image/spaces.png",
-                    title: "Park On Street",
-                    navigator: HomePage(),
-                  ),
+                      image: "image/spaces1.png",
+                      title: "Park On Street",
+                      onTap: () async {
+                        if (await bookProvider!.getbook()) {
+                          bookProvider!.getbook();
+                          Navigator.push(
+                              context,
+                              PageTransition(
+                                type: PageTransitionType.fade,
+                                child: Parking_Timer(),
+                                isIos: false,
+                                duration: Duration(milliseconds: 300),
+                              ));
+                        } else {
+                          userProvider!.getallCar_user();
+                          mapProvider!.getallZone();
+                          Navigator.push(
+                              context,
+                              PageTransition(
+                                type: PageTransitionType.fade,
+                                child: ParkingHome(),
+                                isIos: false,
+                                duration: Duration(milliseconds: 300),
+                              ));
+                        }
+                      }),
                 ],
               ),
             ),

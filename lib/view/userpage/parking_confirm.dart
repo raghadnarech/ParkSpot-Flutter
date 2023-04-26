@@ -4,6 +4,7 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:park_spot/const/constants.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:park_spot/provider/BookProvider.dart';
 import 'package:park_spot/provider/UserProvider.dart';
 import 'package:park_spot/view/splash.dart';
 import 'package:park_spot/view/userpage/parking_timer.dart';
@@ -13,7 +14,8 @@ import 'package:provider/provider.dart';
 class Parking_Confirm extends StatefulWidget {
   String? parkname;
   String? parktype;
-  Parking_Confirm({this.parkname, this.parktype, super.key});
+  int? idpark;
+  Parking_Confirm({this.parkname, this.parktype, this.idpark, super.key});
 
   @override
   State<Parking_Confirm> createState() => _Parking_ConfirmState();
@@ -24,6 +26,7 @@ class _Parking_ConfirmState extends State<Parking_Confirm> {
 
   @override
   Widget build(BuildContext context) {
+    BookProvider bookProvider = Provider.of<BookProvider>(context);
     userProvider = Provider.of<UserProvider>(context);
     int def = userProvider!.defaultcar;
     return Scaffold(
@@ -374,36 +377,66 @@ class _Parking_ConfirmState extends State<Parking_Confirm> {
                     Row(
                       children: [
                         Expanded(
-                            child: ElevatedButton(
-                          onPressed: () {
-                            if (isSelected != 0) {
-                              Navigator.push(
-                                  context,
-                                  PageTransition(
-                                    type: PageTransitionType.fade,
-                                    child: Parking_Timer(
-                                      index: userProvider!.defaultcar,
-                                      time: isSelected,
-                                      parkingName: widget.parkname,
-                                      parkingType: widget.parktype,
+                            child: bookProvider.isLoadingendparking
+                                ? ElevatedButton(
+                                    onPressed: () {},
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                      ),
                                     ),
-                                    isIos: false,
-                                    duration: Duration(milliseconds: 300),
-                                  ));
-                            } else {
-                              Flushbar(
-                                title: 'Please select hours to park',
-                                message:
-                                    'You must choose at least an hour to book',
-                                backgroundColor: Colors.red,
-                                duration: Duration(seconds: 3),
-                              ).show(context);
-                            }
-                          },
-                          child: Text("Pay"),
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: kPrimaryColor),
-                        ))
+                                  )
+                                : ElevatedButton(
+                                    onPressed: () async {
+                                      String text;
+                                      if (isSelected != 0) {
+                                        text = await bookProvider.createBook(
+                                            isSelected,
+                                            userProvider!
+                                                .CarList[
+                                                    userProvider!.defaultcar]
+                                                .Country,
+                                            userProvider!
+                                                .CarList[
+                                                    userProvider!.defaultcar]
+                                                .NumCar,
+                                            1);
+                                        if (text != '') {
+                                          // ignore: use_build_context_synchronously
+                                          Flushbar(
+                                            title: 'Error',
+                                            message: '$text',
+                                            backgroundColor: Colors.red,
+                                            duration: Duration(seconds: 3),
+                                          ).show(context);
+                                        } else {
+                                          await userProvider!.getamount();
+
+                                          // ignore: use_build_context_synchronously
+                                          Navigator.pushReplacement(
+                                              context,
+                                              PageTransition(
+                                                type: PageTransitionType.fade,
+                                                child: Parking_Timer(),
+                                                isIos: false,
+                                                duration:
+                                                    Duration(milliseconds: 300),
+                                              ));
+                                        }
+                                      } else {
+                                        Flushbar(
+                                          title: 'Please select hours to park',
+                                          message:
+                                              'You must choose at least an hour to book',
+                                          backgroundColor: Colors.red,
+                                          duration: Duration(seconds: 3),
+                                        ).show(context);
+                                      }
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor: kPrimaryColor),
+                                    child: Text("Pay"),
+                                  ))
                       ],
                     ),
                   ],

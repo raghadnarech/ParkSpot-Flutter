@@ -9,8 +9,8 @@ import '../const/constants.dart';
 class ButtonGridHome extends StatelessWidget {
   String? title;
   String? image;
-  Widget? navigator;
-  ButtonGridHome({this.image, this.title, this.navigator});
+  Function()? onTap;
+  ButtonGridHome({this.image, this.title, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -19,18 +19,7 @@ class ButtonGridHome extends StatelessWidget {
     userProvider = Provider.of<UserProvider>(context);
 
     return InkWell(
-      onTap: () async {
-        userProvider!.getallCar_user();
-        mapProvider!.getallZone();
-        Navigator.push(
-            context,
-            PageTransition(
-              type: PageTransitionType.fade,
-              child: navigator!,
-              isIos: false,
-              duration: Duration(milliseconds: 300),
-            ));
-      },
+      onTap: onTap,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

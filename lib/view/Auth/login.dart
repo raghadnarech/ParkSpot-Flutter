@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:park_spot/const/constants.dart';
+import 'package:park_spot/main.dart';
 import 'package:park_spot/provider/AuthProvider.dart';
 import 'package:park_spot/view/Auth/signup.dart';
 import 'package:park_spot/view/home.dart';
@@ -14,8 +15,8 @@ import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-TextEditingController? _controllerPhoneNumber = TextEditingController();
-TextEditingController? _controllerPassword = TextEditingController();
+TextEditingController _controllerPhoneNumber = TextEditingController();
+TextEditingController _controllerPassword = TextEditingController();
 
 class LoginPage extends StatelessWidget {
   final GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
@@ -26,7 +27,7 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    AuthProvider auth = Provider.of<AuthProvider>(context);
+    authProvider = Provider.of<AuthProvider>(context);
 
     return Scaffold(
       body: SafeArea(
@@ -93,14 +94,17 @@ class LoginPage extends StatelessWidget {
                           style: ElevatedButton.styleFrom(
                               backgroundColor: kPrimaryColor),
                           onPressed: () async {
+                            SharedPreferences prefs =
+                                await SharedPreferences.getInstance();
                             String text;
+
                             if (_globalKey.currentState!.validate()) {
                               if (_controllerPhoneNumber != "" &&
                                   _controllerPassword != "") {
-                                text = await auth.login(
-                                    "0${_controllerPhoneNumber!.text}",
-                                    _controllerPassword!.text);
-                                if (text != "") {
+                                text = await authProvider!.login(
+                                    "0${_controllerPhoneNumber.text}",
+                                    _controllerPassword.text);
+                                if (text != '') {
                                   Flushbar(
                                     title: 'Login Feild',
                                     message: '$text',
@@ -108,36 +112,21 @@ class LoginPage extends StatelessWidget {
                                     backgroundColor: Colors.red,
                                   ).show(context);
                                 } else {
-                                  await userProvider!.getUser();
                                   Navigator.pushReplacement(
                                       context,
                                       PageTransition(
-                                        type: PageTransitionType.fade,
+                                        type: PageTransitionType.rightToLeft,
                                         child: HomePage(),
                                         isIos: false,
                                         duration: Duration(milliseconds: 300),
                                       ));
-                                  await userProvider!.getamount();
-
-                                  final prefs =
-                                      await SharedPreferences.getInstance();
-                                  prefs.setBool("isLogged", true);
-                                  _controllerPassword!.text = "";
-                                  _controllerPhoneNumber!.text = "";
+                                  await prefs.setBool('isLogged', true);
                                 }
-                                // Navigator.pushReplacement(
-                                //     context,10
-                                //     PageTransition(
-                                //       type: PageTransitionType.fade,
-                                //       child: LoadingPage(),
-                                //       isIos: false,
-                                //       duration: Duration(milliseconds: 300),
-                                //     ));
                               }
                             }
                             ;
                           },
-                          child: userProvider!.isLoading
+                          child: authProvider!.isLoadingLogin
                               ? CircularProgressIndicator(
                                   color: kBaseColor,
                                 )

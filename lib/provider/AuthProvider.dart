@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:park_spot/const/api_url.dart';
 import 'package:park_spot/model/car.dart';
 import 'package:park_spot/model/user.dart';
 import 'package:park_spot/provider/UserProvider.dart';
@@ -13,80 +14,64 @@ import 'package:shared_preferences/shared_preferences.dart';
 late final UserPrefrences userPrefrences;
 
 class AuthProvider extends ChangeNotifier {
-  String? _phone;
   User? user;
-  bool _isLoading = false;
-  List<Car> CarList = [];
-  Car? car;
+  bool _isLoadinglogin = false;
+  bool _isLoadingsignup = false;
 
-  setphone(String phone) {
-    _phone = phone;
+  Future<String> register(String name, String phone, String password) async {
+    _isLoadingsignup = true;
     notifyListeners();
-  }
-
-  get phonenumber {
-    return _phone;
-  }
-
-  Future<void> register(String name, String phone, String password) async {
-    _isLoading = true;
-    // await Future.delayed(Duration(seconds: 10));
     http.Response response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/api/addusers'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
+      Uri.parse('$local$userRegister'),
+      headers: {
+        'Accept': 'application/json',
+        'api_key': apiKey,
       },
-      body: await jsonEncode(
-          <String, String>{'name': name, 'phone': phone, 'password': password}),
+      body: {'name': name, 'phone': phone, 'password': password},
     );
     dynamic data = jsonDecode(response.body);
-    int id = data['user-id'];
-    print(id);
-    _isLoading = false;
-    user = User(
-      id: id,
-      name: name,
-      password: password,
-      phone: phone,
-    );
-    await userProvider!.saveUser(user!);
-
-    userProvider!.setUser(user!);
+    if (response.statusCode == 201) {
+      _isLoadinglogin = false;
+      notifyListeners();
+      login(phone, password);
+      return '';
+    }
+    _isLoadinglogin = false;
     notifyListeners();
-  }
-
-  get isLoading {
-    return _isLoading;
+    return data['msg'];
   }
 
   Future<String> login(String? phone, String? password) async {
-    _isLoading = true;
-    int i;
-
+    _isLoadinglogin = true;
     http.Response response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/api/Login'),
+      Uri.parse('$local$userLogin'),
       headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
+        'Accept': 'application/json',
+        'api_key': apiKey,
       },
-      body: await jsonEncode(
-          <String, String>{'phone': phone!, 'password': password!}),
+      body: {'phone': phone!, 'password': password!},
     );
-    if (response.body == "The number is not registered") {
-      _isLoading = false;
+    dynamic data = json.decode(response.body);
+    _isLoadinglogin = false;
+    notifyListeners();
 
-      return "The number is not registered";
-    } else if (response.body == "The number or password is incorrect") {
-      _isLoading = false;
-
-      return "The number or password is incorrect";
-    } else {
-      var data = await json.decode(response.body);
-
-      await saveUser(User.fromJson(data[0]));
-      _isLoading = false;
+    if (response.statusCode == 200) {
+      await saveUser(User.fromJson(data['data']));
+      _isLoadinglogin = false;
       notifyListeners();
-      return "";
+      return '';
     }
+    _isLoadinglogin = false;
+    notifyListeners();
+    return data['msg'];
+  }
+
+  get isLoadingLogin {
+    return _isLoadinglogin;
+  }
+
+  get isLoadingSignup {
+    return _isLoadingsignup;
   }
 
   Future<void> saveUser(User user) async {
@@ -94,12 +79,8 @@ class AuthProvider extends ChangeNotifier {
     prefs.setInt('id', user.id!);
     prefs.setString('name', user.name!);
     prefs.setString('phone', user.phone!);
-    prefs.setString('password', user.password!);
+    prefs.setString('token', user.token!);
     notifyListeners();
-  }
-
-  get username {
-    return user!.name.toString();
   }
 
   Future<void> getUser() async {
@@ -107,14 +88,9 @@ class AuthProvider extends ChangeNotifier {
     int? id = prefs.getInt('id');
     String? name = prefs.getString('name');
     String? phone = prefs.getString('phone');
-    String? password = prefs.getString('password');
+    String? token = prefs.getString('token');
 
-    user = User(
-      id: id,
-      name: name,
-      password: password,
-      phone: phone,
-    );
+    user = User(id: id, name: name, phone: phone, token: token);
     notifyListeners();
   }
 }

@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:park_spot/const/constants.dart';
 import 'package:park_spot/provider/AuthProvider.dart';
+import 'package:park_spot/provider/BookProvider.dart';
 import 'package:park_spot/provider/MapProvider.dart';
 import 'package:park_spot/provider/UserProvider.dart';
 import 'package:park_spot/view/Auth/register.dart';
@@ -40,11 +41,15 @@ class MyApp extends StatelessWidget {
             create: ((context) => MapProvider())),
         ChangeNotifierProvider<UserProvider>(
           create: ((context) => UserProvider()),
+        ),
+        ChangeNotifierProvider<BookProvider>(
+          create: ((context) => BookProvider()),
         )
       ],
       child: MaterialApp(
         theme: ThemeData(
             fontFamily: 'Poppins',
+            // useMaterial3: true,
             textSelectionTheme: TextSelectionThemeData(
               cursorColor: kPrimaryColor,
               selectionColor: kSecandryColor,

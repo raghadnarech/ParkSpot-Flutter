@@ -19,6 +19,7 @@ class MyVehiclePage extends StatelessWidget {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     userProvider = Provider.of<UserProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: kBaseColor,
@@ -129,7 +130,12 @@ class MyVehiclePage extends StatelessWidget {
                                               if (userProvider!
                                                       .CarList.length !=
                                                   1) {
-                                                userProvider!.delete_car(index);
+                                                userProvider!.delete_car(
+                                                    userProvider!
+                                                        .CarList[index].Country,
+                                                    userProvider!
+                                                        .CarList[index].NumCar
+                                                        .toString());
                                                 userProvider!.getallCar_user();
                                               } else {
                                                 Flushbar(

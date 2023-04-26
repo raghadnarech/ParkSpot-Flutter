@@ -257,26 +257,30 @@ class _Register_CarState extends State<Register_Car> {
                           style: ElevatedButton.styleFrom(
                               backgroundColor: kPrimaryColor),
                           onPressed: () async {
+                            String text;
                             if (_globalKey.currentState!.validate()) {
-                              await auth.register_car(
+                              text = await auth.register_car(
                                   CountrySelect,
                                   _vehicleIDController.text,
                                   TypeSelect,
                                   ColorSelect);
-                              Navigator.pushReplacement(
-                                  context,
-                                  PageTransition(
-                                    type: PageTransitionType.fade,
-                                    child: HomePage(),
-                                    isIos: false,
-                                    duration: Duration(milliseconds: 300),
-                                  ));
-                              Flushbar(
-                                backgroundColor: Colors.green,
-                                title: 'Done',
-                                message: 'The car has been added successfully',
-                                duration: Duration(seconds: 3),
-                              ).show(context);
+                              if (text != '') {
+                                Flushbar(
+                                  backgroundColor: Colors.red,
+                                  title: 'Failed',
+                                  message: '$text',
+                                  duration: Duration(seconds: 3),
+                                ).show(context);
+                              } else {
+                                Navigator.pushReplacement(
+                                    context,
+                                    PageTransition(
+                                      type: PageTransitionType.fade,
+                                      child: HomePage(),
+                                      isIos: false,
+                                      duration: Duration(milliseconds: 300),
+                                    ));
+                              }
                             }
                           },
                           child: Text(

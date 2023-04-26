@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:park_spot/const/constants.dart';
 import 'package:park_spot/provider/AuthProvider.dart';
 import 'package:park_spot/view/Auth/register_car.dart';
+import 'package:park_spot/view/splash.dart';
 
 import 'package:park_spot/widget/textinput_auth.dart';
 import 'package:page_transition/page_transition.dart';
@@ -16,9 +17,10 @@ TextEditingController _repasswordController = TextEditingController();
 final GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
 
 class Register extends StatefulWidget {
+  String? phone;
   bool? showlogin;
 
-  Register({super.key, this.showlogin});
+  Register({super.key, this.showlogin, this.phone});
 
   @override
   State<Register> createState() => _RegisterState();
@@ -29,7 +31,7 @@ class _RegisterState extends State<Register> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    AuthProvider auth = Provider.of<AuthProvider>(context);
+    authProvider = Provider.of<AuthProvider>(context);
     bool isLoading = false;
 
     return Scaffold(
@@ -76,8 +78,7 @@ class _RegisterState extends State<Register> {
                             borderRadius: BorderRadius.all(Radius.circular(5)),
                             color: Color(0xffececec),
                           ),
-                          child:
-                              Center(child: Text("+963${auth.phonenumber}"))),
+                          child: Center(child: Text("+963${widget.phone}"))),
                       SizedBox(
                         height: height * 0.02,
                       ),
@@ -142,48 +143,36 @@ class _RegisterState extends State<Register> {
                           style: ElevatedButton.styleFrom(
                               backgroundColor: kPrimaryColor),
                           onPressed: () async {
+                            String? text;
                             if (_globalKey.currentState!.validate()) {
-                              if (_passwordController.text !=
+                              if (_passwordController.text ==
                                   _repasswordController.text) {
-                                Flushbar(
-                                  title: 'Password',
-                                  message: 'Please Check your Password',
-                                  duration: Duration(seconds: 3),
-                                ).show(context);
-                              } else {
-                                setState(() {
-                                  isLoading = true;
-                                });
-                                await auth.register(
+                                text = await authProvider!.register(
                                     _nameController.text,
-                                    "0${auth.phonenumber}",
+                                    "0${widget.phone}",
                                     _passwordController.text);
-
-                                _nameController.text = "";
-                                _passwordController.text = "";
-                                _repasswordController.text = "";
-
-                                Navigator.push(
-                                    context,
-                                    PageTransition(
-                                      type: PageTransitionType.fade,
-                                      child: Register_Car(),
-                                      isIos: false,
-                                      duration: Duration(milliseconds: 300),
-                                    ));
+                                if (text != '') {
+                                  Flushbar(
+                                    title: 'Register Feild',
+                                    message: '$text',
+                                    duration: Duration(seconds: 3),
+                                    backgroundColor: Colors.red,
+                                  ).show(context);
+                                } else {
+                                  Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => Register_Car()),
+                                      (route) => false);
+                                }
                               }
                             }
                           },
-                          child: auth.isLoading
-                              ? CircularProgressIndicator(
-                                  color: kBaseColor,
-                                )
-                              : Text(
-                                  "Next",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
-                                ),
+                          child: Text(
+                            "Next",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
                       SizedBox(

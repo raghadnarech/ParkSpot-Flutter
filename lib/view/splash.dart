@@ -2,6 +2,7 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:park_spot/main.dart';
 import 'package:park_spot/provider/AuthProvider.dart';
+import 'package:park_spot/provider/BookProvider.dart';
 import 'package:park_spot/provider/MapProvider.dart';
 import 'package:park_spot/provider/UserProvider.dart';
 
@@ -22,6 +23,7 @@ class Splash extends StatefulWidget {
 MapProvider? mapProvider;
 AuthProvider? authProvider;
 UserProvider? userProvider;
+BookProvider? bookProvider;
 
 class _SplashState extends State<Splash> {
   @override
@@ -30,8 +32,10 @@ class _SplashState extends State<Splash> {
     super.initState();
   }
 
-  Widget routePage() {
+  Future<Widget> routePage() async {
     if (widget.isLogging) {
+      await userProvider!.getUser();
+      await userProvider!.getamount();
       return HomePage();
     } else {
       if (widget.showLogin) {
@@ -46,31 +50,17 @@ class _SplashState extends State<Splash> {
     await Future.delayed(
         Duration(seconds: 7),
         () async => {
+              await mapProvider!.checkPermissionAndGetLocation(),
               Navigator.pushReplacement(
                   context,
                   PageTransition(
                     type: PageTransitionType.rightToLeft,
-                    child: routePage(),
+                    child: await routePage(),
                     isIos: false,
                     duration: Duration(milliseconds: 300),
                   ))
             });
   }
-
-  // _navigatetohome() async {
-  //   await Future.delayed(
-  //       Duration(seconds: 7),
-  //       () async => {
-  //             Navigator.pushReplacement(
-  //                 context,
-  //                 PageTransition(
-  //                   type: PageTransitionType.rightToLeft,
-  //                   child: LoginPage(),
-  //                   isIos: false,
-  //                   duration: Duration(milliseconds: 300),
-  //                 )),
-  //           });
-  // }
 
   @override
   void dispose() {
@@ -79,11 +69,8 @@ class _SplashState extends State<Splash> {
 
   @override
   Widget build(BuildContext context) {
-    MapProvider mapProvider = Provider.of<MapProvider>(context);
+    mapProvider = Provider.of<MapProvider>(context);
     userProvider = Provider.of<UserProvider>(context);
-    userProvider!.getUser();
-    userProvider!.getamount();
-    mapProvider.checkPermissionAndGetLocation();
 
     return Scaffold(
       body: SizedBox(
