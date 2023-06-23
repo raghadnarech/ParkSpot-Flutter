@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:park_spot/const/constants.dart';
 import 'package:park_spot/provider/AuthProvider.dart';
 import 'package:park_spot/view/Auth/register_car.dart';
-import 'package:park_spot/view/splash.dart';
+import 'package:park_spot/view/Splash/splash.dart';
 
 import 'package:park_spot/widget/textinput_auth.dart';
 import 'package:page_transition/page_transition.dart';
@@ -143,36 +143,43 @@ class _RegisterState extends State<Register> {
                           style: ElevatedButton.styleFrom(
                               backgroundColor: kPrimaryColor),
                           onPressed: () async {
-                            String? text;
                             if (_globalKey.currentState!.validate()) {
                               if (_passwordController.text ==
                                   _repasswordController.text) {
-                                text = await authProvider!.register(
+                                if (await authProvider.register(
                                     _nameController.text,
                                     "0${widget.phone}",
-                                    _passwordController.text);
-                                if (text != '') {
-                                  Flushbar(
-                                    title: 'Register Feild',
-                                    message: '$text',
-                                    duration: Duration(seconds: 3),
-                                    backgroundColor: Colors.red,
-                                  ).show(context);
-                                } else {
+                                    _passwordController.text)) {
                                   Navigator.pushAndRemoveUntil(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) => Register_Car()),
                                       (route) => false);
+                                } else {
+                                  Flushbar(
+                                    title: 'Register Feild',
+                                    message:
+                                        'Some things is Worng, please try again',
+                                    duration: Duration(seconds: 3),
+                                    backgroundColor: Colors.red,
+                                  ).show(context);
                                 }
                               }
                             }
                           },
-                          child: Text(
-                            "Next",
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
+                          child: authProvider.isLoadingsignup
+                              ? Text(
+                                  "Next",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                )
+                              : Text(
+                                  "Loading ...",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold),
+                                ),
                         ),
                       ),
                       SizedBox(

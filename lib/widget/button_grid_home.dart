@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:park_spot/provider/AuthProvider.dart';
 import 'package:park_spot/provider/MapProvider.dart';
-import 'package:park_spot/provider/UserProvider.dart';
-import 'package:park_spot/view/splash.dart';
+import 'package:park_spot/provider/CarProvider.dart';
+import 'package:park_spot/view/Splash/splash.dart';
 import 'package:provider/provider.dart';
 import '../const/constants.dart';
 
@@ -16,7 +17,7 @@ class ButtonGridHome extends StatelessWidget {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     mapProvider = Provider.of<MapProvider>(context);
-    userProvider = Provider.of<UserProvider>(context);
+    authProvider = Provider.of<AuthProvider>(context);
 
     return InkWell(
       onTap: onTap,

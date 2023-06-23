@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:park_spot/const/constants.dart';
 import 'package:park_spot/provider/BookProvider.dart';
-import 'package:park_spot/provider/UserProvider.dart';
-import 'package:park_spot/view/home.dart';
-import 'package:park_spot/view/splash.dart';
+import 'package:park_spot/provider/CarProvider.dart';
+import 'package:park_spot/provider/WalletProvider.dart';
+import 'package:park_spot/view/Home/home.dart';
+import 'package:park_spot/view/Splash/splash.dart';
 import 'package:park_spot/widget/rowfromparkindetail.dart';
 import 'package:provider/provider.dart';
 
@@ -19,6 +20,7 @@ class _Parking_TimerState extends State<Parking_Timer> {
 
   @override
   Widget build(BuildContext context) {
+    walletProvider = Provider.of<WalletProvider>(context);
     int hourselect = 1;
     List<int> hours = [1, 2, 3, 4];
     bookProvider = Provider.of<BookProvider>(context);
@@ -42,7 +44,7 @@ class _Parking_TimerState extends State<Parking_Timer> {
             },
             icon: Icon(Icons.arrow_back)),
       ),
-      body: bookProvider!.isLoadingparking!
+      body: bookProvider.isLoadingparking!
           ? Center(
               child: CircularProgressIndicator(
               color: kPrimaryColor,
@@ -70,7 +72,7 @@ class _Parking_TimerState extends State<Parking_Timer> {
                             valueColor: kPrimaryColor,
                             backgroundColor: kBaseSecandryColor,
                             initialPosition: 0,
-                            duration: bookProvider!.book!.calctime!,
+                            duration: bookProvider.book!.calctime!,
                             timeFormatter: (seconds) {
                               return Duration(seconds: seconds)
                                   .toString()
@@ -99,34 +101,34 @@ class _Parking_TimerState extends State<Parking_Timer> {
                               children: [
                                 RowDetailsParkingTimer(
                                   title: "Parking Area",
-                                  text: "${bookProvider!.book!.zonename}",
+                                  text: "${bookProvider.book!.zonename}",
                                 ),
                                 RowDetailsParkingTimer(
                                   title: "Vehicle",
-                                  text: "${bookProvider!.book!.country}" +
-                                      "  ${bookProvider!.book!.num_car}",
+                                  text: "${bookProvider.book!.country}" +
+                                      "  ${bookProvider.book!.num_car}",
                                 ),
                                 RowDetailsParkingTimer(
                                   title: "Parking Spot",
-                                  text: "${bookProvider!.book!.parkspot}",
+                                  text: "${bookProvider.book!.parkspot}",
                                 ),
                                 RowDetailsParkingTimer(
                                   title: "Date",
-                                  text: "${bookProvider!.book!.date}",
+                                  text: "${bookProvider.book!.date}",
                                 ),
                                 RowDetailsParkingTimer(
                                   title: "Duration",
-                                  text: "${bookProvider!.book!.hours}",
+                                  text: "${bookProvider.book!.hours}",
                                 ),
                                 RowDetailsParkingTimer(
                                   title: "Start Time:",
                                   text:
-                                      "${bookProvider!.book!.startTime!.substring(0, 5)}",
+                                      "${bookProvider.book!.startTime!.substring(0, 5)}",
                                 ),
                                 RowDetailsParkingTimer(
                                   title: "End Time:",
                                   text:
-                                      "${bookProvider!.book!.endTime!.substring(0, 5)}",
+                                      "${bookProvider.book!.endTime!.substring(0, 5)}",
                                 ),
                               ],
                             ),
@@ -145,93 +147,73 @@ class _Parking_TimerState extends State<Parking_Timer> {
                                     showDialog(
                                         context: context,
                                         builder: (_) {
-                                          return AlertDialog(
-                                              actions: [
-                                                ElevatedButton(
-                                                    style: ButtonStyle(
-                                                        backgroundColor:
-                                                            MaterialStateColor
-                                                                .resolveWith(
-                                                                    (states) =>
-                                                                        kPrimaryColor)),
-                                                    onPressed: () async {
-                                                      await bookProvider!
-                                                          .extendParkingTime(
-                                                              hourselect);
+                                          return StatefulBuilder(
+                                            builder: (context, setState) => AlertDialog(
+                                                actions: [
+                                                  ElevatedButton(
+                                                      style: ButtonStyle(
+                                                          backgroundColor:
+                                                              MaterialStateColor
+                                                                  .resolveWith(
+                                                                      (states) =>
+                                                                          kPrimaryColor)),
+                                                      onPressed: () async {
+                                                        await bookProvider
+                                                            .extendParkingTime(
+                                                                hourselect);
 
-                                                      await bookProvider!
-                                                          .getbook();
-                                                      await userProvider!
-                                                          .getamount();
+                                                        await bookProvider
+                                                            .getbook();
+                                                        await walletProvider
+                                                            .getamount();
 
-                                                      // await bookProvider!.calcBook();
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: Text("Ok"))
-                                              ],
-                                              content: DropdownButtonFormField(
-                                                  dropdownColor:
-                                                      Color(0xffececec),
-                                                  decoration: InputDecoration(
-                                                      focusedBorder:
-                                                          OutlineInputBorder(
-                                                              borderRadius:
-                                                                  BorderRadius.all(
-                                                                      Radius.circular(
-                                                                          5)),
-                                                              borderSide:
-                                                                  BorderSide(
-                                                                color: Color(
-                                                                    0xffececec),
-                                                              )),
-                                                      fillColor:
-                                                          Color(0xffececec),
-                                                      focusColor:
-                                                          Color(0xffececec),
-                                                      disabledBorder:
-                                                          OutlineInputBorder(
-                                                              borderRadius:
-                                                                  BorderRadius.all(
-                                                                      Radius.circular(
-                                                                          5)),
-                                                              borderSide:
-                                                                  BorderSide(
-                                                                color: Color(
-                                                                    0xffececec),
-                                                              )),
-                                                      enabledBorder:
-                                                          OutlineInputBorder(
-                                                              borderRadius:
-                                                                  BorderRadius.all(
-                                                                      Radius.circular(
-                                                                          5)),
-                                                              borderSide:
-                                                                  BorderSide(
-                                                                color: Color(
-                                                                    0xffececec),
-                                                              )),
-                                                      border:
-                                                          OutlineInputBorder(
-                                                        borderSide: BorderSide(
-                                                          color:
-                                                              Color(0xffececec),
-                                                        ),
-                                                      )),
-                                                  value: hourselect,
-                                                  items: hours
-                                                      .map((item) =>
-                                                          DropdownMenuItem<int>(
-                                                            value: item,
-                                                            child: Text(item
-                                                                .toString()),
-                                                          ))
-                                                      .toList(),
-                                                  onChanged: (int? item) =>
-                                                      setState(() {
-                                                        hourselect = item!;
-                                                      })),
-                                              title:
-                                                  Text("Choese Extend Hours: "));
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text("Ok"))
+                                                ],
+                                                content: DropdownButtonFormField(
+                                                    dropdownColor: Color(0xffececec),
+                                                    decoration: InputDecoration(
+                                                        focusedBorder: OutlineInputBorder(
+                                                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                                                            borderSide: BorderSide(
+                                                              color: Color(
+                                                                  0xffececec),
+                                                            )),
+                                                        fillColor: Color(0xffececec),
+                                                        focusColor: Color(0xffececec),
+                                                        disabledBorder: OutlineInputBorder(
+                                                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                                                            borderSide: BorderSide(
+                                                              color: Color(
+                                                                  0xffececec),
+                                                            )),
+                                                        enabledBorder: OutlineInputBorder(
+                                                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                                                            borderSide: BorderSide(
+                                                              color: Color(
+                                                                  0xffececec),
+                                                            )),
+                                                        border: OutlineInputBorder(
+                                                          borderSide:
+                                                              BorderSide(
+                                                            color: Color(
+                                                                0xffececec),
+                                                          ),
+                                                        )),
+                                                    value: hourselect,
+                                                    items: hours
+                                                        .map((item) => DropdownMenuItem<int>(
+                                                              value: item,
+                                                              child: Text(item
+                                                                  .toString()),
+                                                            ))
+                                                        .toList(),
+                                                    onChanged: (int? item) => setState(() {
+                                                          hourselect = item!;
+                                                        })),
+                                                title: Text("Choese Extend Hours: ")),
+                                          );
                                         });
                                   },
                                 ),
@@ -301,7 +283,7 @@ class _Parking_TimerState extends State<Parking_Timer> {
                                                                 milliseconds:
                                                                     100),
                                                           ));
-                                                      await bookProvider!
+                                                      await bookProvider
                                                           .endPark();
                                                     },
                                                     child: Text("Confirm"))

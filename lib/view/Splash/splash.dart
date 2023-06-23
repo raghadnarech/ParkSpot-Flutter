@@ -4,10 +4,12 @@ import 'package:park_spot/main.dart';
 import 'package:park_spot/provider/AuthProvider.dart';
 import 'package:park_spot/provider/BookProvider.dart';
 import 'package:park_spot/provider/MapProvider.dart';
-import 'package:park_spot/provider/UserProvider.dart';
+import 'package:park_spot/provider/TransactionProvider.dart';
+import 'package:park_spot/provider/CarProvider.dart';
+import 'package:park_spot/provider/WalletProvider.dart';
 
 import 'package:park_spot/view/Auth/login.dart';
-import 'package:park_spot/view/home.dart';
+import 'package:park_spot/view/Home/home.dart';
 import 'package:park_spot/view/onboarding/onboarding.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
@@ -20,10 +22,12 @@ class Splash extends StatefulWidget {
   State<Splash> createState() => _SplashState();
 }
 
-MapProvider? mapProvider;
-AuthProvider? authProvider;
-UserProvider? userProvider;
-BookProvider? bookProvider;
+MapProvider mapProvider = MapProvider();
+AuthProvider authProvider = AuthProvider();
+CarProvider carProvider = CarProvider();
+BookProvider bookProvider = BookProvider();
+TransactionProvider transactionProvider = TransactionProvider();
+WalletProvider walletProvider = WalletProvider();
 
 class _SplashState extends State<Splash> {
   @override
@@ -34,8 +38,9 @@ class _SplashState extends State<Splash> {
 
   Future<Widget> routePage() async {
     if (widget.isLogging) {
-      await userProvider!.getUser();
-      await userProvider!.getamount();
+      walletProvider.getamount();
+      transactionProvider.getTypeCost();
+      authProvider.getUser();
       return HomePage();
     } else {
       if (widget.showLogin) {
@@ -50,7 +55,7 @@ class _SplashState extends State<Splash> {
     await Future.delayed(
         Duration(seconds: 7),
         () async => {
-              await mapProvider!.checkPermissionAndGetLocation(),
+              mapProvider.checkPermissionAndGetLocation(),
               Navigator.pushReplacement(
                   context,
                   PageTransition(
@@ -70,8 +75,10 @@ class _SplashState extends State<Splash> {
   @override
   Widget build(BuildContext context) {
     mapProvider = Provider.of<MapProvider>(context);
-    userProvider = Provider.of<UserProvider>(context);
-
+    authProvider = Provider.of<AuthProvider>(context);
+    carProvider = Provider.of<CarProvider>(context);
+    walletProvider = Provider.of<WalletProvider>(context);
+    transactionProvider = Provider.of<TransactionProvider>(context);
     return Scaffold(
       body: SizedBox(
         child: Row(

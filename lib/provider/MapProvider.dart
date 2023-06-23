@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:park_spot/const/api_url.dart';
 
 import 'package:park_spot/main.dart';
 import 'package:park_spot/model/dirctionmarker.dart';
@@ -25,9 +26,12 @@ class MapProvider with ChangeNotifier {
   LinePoint? point;
   List<LinePoint> listerPoint = [];
   PositionObject? _myPosition;
-  Direction? direction;
+  Direction direction = Direction();
   List<Direction> listdirection = [];
-  bool? _isLoading;
+  bool isLoadinggetallzone = false;
+  bool isLoadinggetlocation = false;
+  bool isLoading = false;
+
   Zone? zone;
   List<Zone> ZonerList = [];
   ZoneAndDirection? zoneAndDirection;
@@ -35,10 +39,12 @@ class MapProvider with ChangeNotifier {
   MapController controller = MapController();
 
   Future<void> getLocation() async {
+    isLoadinggetlocation = true;
+    notifyListeners();
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
     _myPosition = await PositionObject(position.latitude, position.longitude);
-    _isLoading = false;
+    isLoadinggetlocation = false;
     notifyListeners();
   }
 
@@ -60,84 +66,93 @@ class MapProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getallZone() async {
+  Future<bool> getallZone() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
     int i;
     List<Zone> ZoneList = [];
-    _isLoading = true;
-    http.Response response = await http.get(
-      Uri.parse('http://10.0.2.2:8000/api/user/Get_All_Zone'),
-      headers: {
-        'Accept': 'application/json',
-        'api_key': '123456789',
-        'token': token!
-      },
-    );
-
-    dynamic data = await json.decode(response.body);
-    dynamic zones = data['data'];
-    print(zones);
-
-    ZonerList = [];
-    listdirection = [];
-    listZoneAndDirection = [];
-    print(data.length);
-    for (i = 0; i < zones.length; i++) {
-      zone = Zone(
-        id: zones[i]['id'],
-        type: zones[i]['type'],
-        ac_capacity: zones[i]['capacity'],
-        Location: zones[i]['name'],
-        Lat: zones[i]['lat'] as double,
-        Lan: zones[i]['lan'] as double,
-      );
-
-      ZonerList.add(zone!);
-      print(ZonerList);
-      direction = await getDirectionsAPIResponse(i);
-      listdirection.add(direction!);
-      zoneAndDirection = ZoneAndDirection(direction: direction, zone: zone);
-      listZoneAndDirection!.add(zoneAndDirection!);
-    }
-    print(ZonerList);
-    listdirection.sort((a, b) => a.distance! < b.distance! ? 0 : 1);
-    listZoneAndDirection!.sort(
-        (a, b) => a.direction!.distance! < b.direction!.distance! ? 0 : 1);
-    print(listdirection);
-    print(ZonerList);
-    print(listZoneAndDirection);
-    _isLoading = false;
+    isLoadinggetallzone = true;
     notifyListeners();
+    try {
+      http.Response response = await http.get(
+        Uri.parse('$local/user/Get_All_Zone'),
+        headers: {
+          'Accept': 'application/json',
+          'api_key': '123456789',
+          'token': token!
+        },
+      );
+      if (response.statusCode == 200) {
+        dynamic data = await json.decode(response.body);
+        var zones = data['data'];
+        ZonerList = [];
+        listdirection = [];
+        listZoneAndDirection = [];
+        for (i = 0; i < zones.length; i++) {
+          zone = Zone(
+            id: zones[i]['id'],
+            type: zones[i]['type'],
+            ac_capacity: zones[i]['capacity'],
+            Location: zones[i]['name'],
+            Lat: zones[i]['lat'] as double,
+            Lan: zones[i]['lan'] as double,
+          );
+          ZonerList.add(zone!);
+          direction = await getDirectionsAPIResponse(i);
+          listdirection.add(direction);
+          zoneAndDirection = ZoneAndDirection(direction: direction, zone: zone);
+          listZoneAndDirection!.add(zoneAndDirection!);
+        }
+        listdirection.sort((a, b) => a.distance! < b.distance! ? 0 : 1);
+        listZoneAndDirection!.sort(
+            (a, b) => a.direction!.distance! < b.direction!.distance! ? 0 : 1);
+        notifyListeners();
+        isLoadinggetallzone = false;
+        notifyListeners();
+        return true;
+      } else {
+        isLoadinggetallzone = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      isLoadinggetallzone = false;
+      notifyListeners();
+      return false;
+    }
   }
 
   Future<Direction> getDirectionsAPIResponse(int index) async {
-    http.Response responsedata = await http.get(
-      Uri.parse(
-          'https://api.mapbox.com/directions/v5/mapbox/driving/${lon},${lat};${ZonerList[index].Lan},${ZonerList[index].Lat}?alternatives=true&geometries=geojson&language=en&overview=simplified&steps=true&access_token=pk.eyJ1IjoicmFnaGFkbmFyZWNoIiwiYSI6ImNsYWpva2pnNTAwOWYzd3J0d2V4eW5lMXcifQ.TS00nVSRIbtWnuA0N0XtZg'),
-    );
-    dynamic response = json.decode(responsedata.body);
-    int i;
-    geometry = await response['routes'][0]['geometry']['coordinates'];
-    duration = await response['routes'][0]['duration'];
-    distance = await response['routes'][0]['distance'];
-
-    List<LinePoint> listpoint = [];
-    listerPoint = [];
-    for (i = 0; i < geometry!.length; i++) {
-      point = LinePoint(
-        Lat: geometry![i][1],
-        Lon: geometry![i][0],
+    try {
+      http.Response responsedata = await http.get(
+        Uri.parse(
+            'https://api.mapbox.com/directions/v5/mapbox/driving/${lon},${lat};${ZonerList[index].Lan},${ZonerList[index].Lat}?alternatives=true&geometries=geojson&language=en&overview=simplified&steps=true&access_token=pk.eyJ1IjoicmFnaGFkbmFyZWNoIiwiYSI6ImNsYWpva2pnNTAwOWYzd3J0d2V4eW5lMXcifQ.TS00nVSRIbtWnuA0N0XtZg'),
       );
-      listerPoint.add(point!);
+      dynamic response = json.decode(responsedata.body);
+      int i;
+      geometry = await response['routes'][0]['geometry']['coordinates'];
+      duration = await response['routes'][0]['duration'];
+      distance = await response['routes'][0]['distance'];
+
+      List<LinePoint> listpoint = [];
+      listerPoint = [];
+      for (i = 0; i < geometry!.length; i++) {
+        point = LinePoint(
+          Lat: geometry![i][1],
+          Lon: geometry![i][0],
+        );
+        listerPoint.add(point!);
+      }
+
+      duration = duration / 60;
+      distance = distance / 1000;
+
+      direction = Direction(
+          listpoint: listerPoint, distance: distance, duration: duration);
+      return direction;
+    } catch (e) {
+      return Direction.empty();
     }
-
-    duration = duration / 60;
-    distance = distance / 1000;
-
-    direction = Direction(
-        listpoint: listerPoint, distance: distance, duration: duration);
-    return direction!;
   }
 
   buildMaptoMarker({Lat, Lon}) {
@@ -155,9 +170,5 @@ class MapProvider with ChangeNotifier {
 
   get mapcontroller {
     return controller;
-  }
-
-  get isLoading {
-    return _isLoading;
   }
 }

@@ -4,9 +4,9 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:park_spot/const/constants.dart';
-import 'package:park_spot/provider/UserProvider.dart';
-import 'package:park_spot/view/splash.dart';
-import 'package:park_spot/view/userpage/parking_confirm.dart';
+import 'package:park_spot/provider/CarProvider.dart';
+import 'package:park_spot/view/Splash/splash.dart';
+import 'package:park_spot/view/ParkPrevius/ParkingDetails.dart';
 import 'package:provider/provider.dart';
 
 class SelectCar extends StatelessWidget {
@@ -16,7 +16,7 @@ class SelectCar extends StatelessWidget {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    userProvider = Provider.of<UserProvider>(context);
+    carProvider = Provider.of<CarProvider>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: kPrimaryColor,
@@ -33,7 +33,7 @@ class SelectCar extends StatelessWidget {
               height: height * 0.62,
               width: double.infinity,
               child: ListView.builder(
-                  itemCount: userProvider!.CarList.length,
+                  itemCount: carProvider.CarList.length,
                   itemBuilder: (BuildContext context, int index) {
                     return Slidable(
                       endActionPane: ActionPane(
@@ -49,15 +49,15 @@ class SelectCar extends StatelessWidget {
                       ),
                       child: InkWell(
                         onTap: () {
-                          userProvider!.setdefaultcar(index);
+                          carProvider.setdefaultcar(index);
                           Navigator.pop(context);
                         },
                         child: ListTile(
-                          title: Text("${userProvider!.CarList[index].Type}",
+                          title: Text("${carProvider.CarList[index].Type}",
                               style: TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.w500)),
                           subtitle: Text(
-                              "${userProvider!.CarList[index].Country} | ${userProvider!.CarList[index].NumCar}"),
+                              "${carProvider.CarList[index].Country} | ${carProvider.CarList[index].NumCar}"),
                           trailing: Image.asset(
                             "image/carlogo/car.png",
                             fit: BoxFit.fitWidth,

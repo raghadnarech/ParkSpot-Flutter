@@ -4,16 +4,16 @@ import 'package:park_spot/const/constants.dart';
 import 'package:park_spot/provider/AuthProvider.dart';
 import 'package:park_spot/provider/BookProvider.dart';
 import 'package:park_spot/provider/MapProvider.dart';
-import 'package:park_spot/provider/UserProvider.dart';
+import 'package:park_spot/provider/TransactionProvider.dart';
+import 'package:park_spot/provider/CarProvider.dart';
+import 'package:park_spot/provider/WalletProvider.dart';
 import 'package:park_spot/view/Auth/register.dart';
-import 'package:park_spot/view/home.dart';
-import 'package:park_spot/view/splash.dart';
+import 'package:park_spot/view/Home/home.dart';
+import 'package:park_spot/view/Splash/splash.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 Future<void> main() async {
-  
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   final prefs = await SharedPreferences.getInstance();
@@ -41,11 +41,17 @@ class MyApp extends StatelessWidget {
             create: ((context) => AuthProvider())),
         ChangeNotifierProvider<MapProvider>(
             create: ((context) => MapProvider())),
-        ChangeNotifierProvider<UserProvider>(
-          create: ((context) => UserProvider()),
+        ChangeNotifierProvider<CarProvider>(
+          create: ((context) => CarProvider()),
         ),
         ChangeNotifierProvider<BookProvider>(
           create: ((context) => BookProvider()),
+        ),
+        ChangeNotifierProvider<TransactionProvider>(
+          create: ((context) => TransactionProvider()),
+        ),
+        ChangeNotifierProvider<WalletProvider>(
+          create: ((context) => WalletProvider()),
         )
       ],
       child: MaterialApp(

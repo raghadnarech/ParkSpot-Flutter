@@ -2,10 +2,10 @@ import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:park_spot/const/constants.dart';
 import 'package:park_spot/provider/AuthProvider.dart';
-import 'package:park_spot/provider/UserProvider.dart';
+import 'package:park_spot/provider/CarProvider.dart';
 import 'package:park_spot/view/Auth/register_car.dart';
-import 'package:park_spot/view/home.dart';
-import 'package:park_spot/view/splash.dart';
+import 'package:park_spot/view/Home/home.dart';
+import 'package:park_spot/view/Splash/splash.dart';
 import 'package:park_spot/widget/list_tile_drarwer.dart';
 import 'package:provider/provider.dart';
 import 'package:page_transition/page_transition.dart';
@@ -18,7 +18,8 @@ class MyVehiclePage extends StatelessWidget {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    userProvider = Provider.of<UserProvider>(context);
+    carProvider = Provider.of<CarProvider>(context);
+    authProvider = Provider.of<AuthProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -26,7 +27,7 @@ class MyVehiclePage extends StatelessWidget {
         foregroundColor: kBaseThirdyColor,
         elevation: 0,
       ),
-      body: userProvider!.isLoading
+      body: carProvider.isLoadinggetallcar
           ? Center(child: CircularProgressIndicator(color: kPrimaryColor))
           : Column(
               children: [
@@ -41,7 +42,7 @@ class MyVehiclePage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("${userProvider!.user.name}",
+                              Text("${authProvider.user.name}",
                                   style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w500)),
@@ -117,7 +118,7 @@ class MyVehiclePage extends StatelessWidget {
                               height: height * 0.62,
                               width: double.infinity,
                               child: ListView.builder(
-                                  itemCount: userProvider!.CarList.length,
+                                  itemCount: carProvider.CarList.length,
                                   itemBuilder:
                                       (BuildContext context, int index) {
                                     return Slidable(
@@ -126,17 +127,16 @@ class MyVehiclePage extends StatelessWidget {
                                         children: [
                                           SlidableAction(
                                             onPressed: (context) async {
-                                              userProvider!.getallCar_user();
-                                              if (userProvider!
-                                                      .CarList.length !=
+                                              carProvider.getallCar_user();
+                                              if (carProvider.CarList.length !=
                                                   1) {
-                                                userProvider!.delete_car(
-                                                    userProvider!
+                                                carProvider.delete_car(
+                                                    carProvider
                                                         .CarList[index].Country,
-                                                    userProvider!
+                                                    carProvider
                                                         .CarList[index].NumCar
                                                         .toString());
-                                                userProvider!.getallCar_user();
+                                                carProvider.getallCar_user();
                                               } else {
                                                 Flushbar(
                                                   title: 'Action Denied',
@@ -155,12 +155,12 @@ class MyVehiclePage extends StatelessWidget {
                                       ),
                                       child: ListTile(
                                         title: Text(
-                                            "${userProvider!.CarList[index].Type}",
+                                            "${carProvider.CarList[index].Type}",
                                             style: TextStyle(
                                                 fontSize: 20,
                                                 fontWeight: FontWeight.w500)),
                                         subtitle: Text(
-                                            "${userProvider!.CarList[index].Country} | ${userProvider!.CarList[index].NumCar}"),
+                                            "${carProvider.CarList[index].Country} | ${carProvider.CarList[index].NumCar}"),
                                         trailing: Image.asset(
                                           "image/carlogo/car.png",
                                           fit: BoxFit.fitWidth,

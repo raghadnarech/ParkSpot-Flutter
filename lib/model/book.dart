@@ -1,14 +1,14 @@
 class Book {
-  int? id;
-  String? country;
-  int? num_car;
-  String? date;
-  int? hours;
-  String? startTime;
-  String? endTime;
-  String? zonename;
-  String? parkspot;
-  int? calctime;
+  dynamic id;
+  dynamic country;
+  dynamic num_car;
+  dynamic date;
+  dynamic hours;
+  dynamic startTime;
+  dynamic endTime;
+  dynamic zonename;
+  dynamic parkspot;
+  dynamic calctime;
 
   Book(
       {this.country,

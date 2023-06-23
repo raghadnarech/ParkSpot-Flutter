@@ -80,8 +80,8 @@ class _OtpPageState extends State<OtpPage> {
                         showCursor: true,
                         onCompleted: (pin) async {
                           try {
-                            // FirebaseAuth.instance.setSettings(
-                            //     appVerificationDisabledForTesting: true);
+                            FirebaseAuth.instance.setSettings(
+                                appVerificationDisabledForTesting: true);
                             Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
@@ -89,22 +89,22 @@ class _OtpPageState extends State<OtpPage> {
                                           phone: widget.phone,
                                         )),
                                 (route) => false);
-                            // await FirebaseAuth.instance
-                            //     .signInWithCredential(
-                            //         PhoneAuthProvider.credential(
-                            //             verificationId: _verificationCode!,
-                            //             smsCode: pin))
-                            //     .then((value) async {
-                            //   if (value.user != null) {
-                            //     Navigator.pushAndRemoveUntil(
-                            //         context,
-                            //         MaterialPageRoute(
-                            //             builder: (context) => Register(
-                            //                   phone: widget.phone,
-                            //                 )),
-                            //         (route) => true);
-                            //   }
-                            // });
+                            await FirebaseAuth.instance
+                                .signInWithCredential(
+                                    PhoneAuthProvider.credential(
+                                        verificationId: _verificationCode!,
+                                        smsCode: pin))
+                                .then((value) async {
+                              if (value.user != null) {
+                                Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Register(
+                                              phone: widget.phone,
+                                            )),
+                                    (route) => true);
+                              }
+                            });
                           } catch (e) {
                             ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text(e.toString())));
@@ -169,6 +169,7 @@ class _OtpPageState extends State<OtpPage> {
   }
 
   _verifyPhone() async {
+    print(widget.phone);
     // FirebaseAuth.instance.setSettings(appVerificationDisabledForTesting: true);
     await FirebaseAuth.instance.verifyPhoneNumber(
         phoneNumber: '+963${widget.phone}',
@@ -200,10 +201,10 @@ class _OtpPageState extends State<OtpPage> {
         timeout: Duration(seconds: 120));
   }
 
-  // @override
-  // void initState() {
-  //   // TODO: implement initState
-  //   super.initState();
-  //   _verifyPhone();
-  // }
+  @override
+  void initState() {
+    // TODO: implement initState
+    _verifyPhone();
+    super.initState();
+  }
 }

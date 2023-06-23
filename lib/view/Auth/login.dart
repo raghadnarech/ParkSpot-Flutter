@@ -1,4 +1,5 @@
 import 'package:another_flushbar/flushbar.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
@@ -7,9 +8,8 @@ import 'package:park_spot/const/constants.dart';
 import 'package:park_spot/main.dart';
 import 'package:park_spot/provider/AuthProvider.dart';
 import 'package:park_spot/view/Auth/signup.dart';
-import 'package:park_spot/view/home.dart';
-import 'package:park_spot/view/splash.dart';
-import 'package:park_spot/widget/loading_page.dart';
+import 'package:park_spot/view/Home/home.dart';
+import 'package:park_spot/view/Splash/splash.dart';
 import 'package:park_spot/widget/textinput_auth.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
@@ -94,39 +94,29 @@ class LoginPage extends StatelessWidget {
                           style: ElevatedButton.styleFrom(
                               backgroundColor: kPrimaryColor),
                           onPressed: () async {
-                            SharedPreferences prefs =
-                                await SharedPreferences.getInstance();
-                            String text;
-
                             if (_globalKey.currentState!.validate()) {
-                              if (_controllerPhoneNumber != "" &&
-                                  _controllerPassword != "") {
-                                text = await authProvider!.login(
-                                    "0${_controllerPhoneNumber.text}",
-                                    _controllerPassword.text);
-                                if (text != '') {
-                                  Flushbar(
-                                    title: 'Login Feild',
-                                    message: '$text',
-                                    duration: Duration(seconds: 3),
-                                    backgroundColor: Colors.red,
-                                  ).show(context);
-                                } else {
-                                  Navigator.pushReplacement(
-                                      context,
-                                      PageTransition(
-                                        type: PageTransitionType.rightToLeft,
-                                        child: HomePage(),
-                                        isIos: false,
-                                        duration: Duration(milliseconds: 300),
-                                      ));
-                                  await prefs.setBool('isLogged', true);
-                                }
+                              if (await authProvider.login(
+                                  "0${_controllerPhoneNumber.text}",
+                                  _controllerPassword.text)) {
+                                Navigator.pushReplacement(
+                                    context,
+                                    PageTransition(
+                                      type: PageTransitionType.rightToLeft,
+                                      child: HomePage(),
+                                      isIos: false,
+                                      duration: Duration(milliseconds: 300),
+                                    ));
+                              } else {
+                                Flushbar(
+                                  title: 'Login Feild',
+                                  message: 'Email Or Password is wrong',
+                                  duration: Duration(seconds: 3),
+                                  backgroundColor: Colors.red,
+                                ).show(context);
                               }
                             }
-                            ;
                           },
-                          child: authProvider!.isLoadingLogin
+                          child: authProvider.isLoadinglogin
                               ? CircularProgressIndicator(
                                   color: kBaseColor,
                                 )

@@ -51,12 +51,15 @@ class _TextInputAuthState extends State<TextInputAuth> {
           widget.hint == "Phone number ex:(9xx xxx xxx)"
               ? LengthLimitingTextInputFormatter(9)
               : widget.hint == "Vehicle ID"
-                  ? LengthLimitingTextInputFormatter(7)
+                  ? LengthLimitingTextInputFormatter(6)
                   : LengthLimitingTextInputFormatter(30),
         ],
         controller: widget.control,
         validator: ((value) {
-          if (value!.isEmpty) {
+          if (value == null) {
+            return 'Faield Required';
+          }
+          if (value.isEmpty) {
             return errormessage(widget.hint!);
           }
         }),

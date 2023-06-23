@@ -5,11 +5,11 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:park_spot/const/constants.dart';
 import 'package:park_spot/provider/AuthProvider.dart';
-import 'package:park_spot/provider/UserProvider.dart';
+import 'package:park_spot/provider/CarProvider.dart';
 import 'package:park_spot/view/Auth/login.dart';
 import 'package:park_spot/view/Auth/otp_page.dart';
-import 'package:park_spot/view/home.dart';
-import 'package:park_spot/view/splash.dart';
+import 'package:park_spot/view/Home/home.dart';
+import 'package:park_spot/view/Splash/splash.dart';
 import 'package:park_spot/widget/textinput_auth.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
@@ -29,26 +29,165 @@ TextEditingController countryController = TextEditingController();
 class _Register_CarState extends State<Register_Car> {
   TextEditingController _vehicleIDController = TextEditingController();
   final GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
-  String TypeSelect = "KIA";
+  String TypeSelect = "Kia";
   List<String> Type = [
+    "Kia",
+    "Abarth",
+    "AC",
+    "Acura",
+    "Aixam",
+    "Alfa Romeo",
+    "Ariel",
+    "Arrinera",
+    "Aston Martin",
+    "Audi",
+    "Bentley",
     "BMW",
-    "KIA",
+    "Bugatti",
+    "Buick",
+    "Cadillac",
+    "Caterham",
+    "Chevrolet",
+    "Chrysler",
+    "Citroen",
+    "Delorean",
+    "Corvette",
+    "Dacia",
+    "Daewoo",
+    "Daf",
+    "Daihatsu",
+    "Dodge",
+    "Dr Motor",
+    "Elfin",
+    "Ferrari",
+    "Fiat",
+    "Ford",
+    "Ford Mustang",
+    "Gaz",
+    "Geely",
+    "General Motors",
+    "Gillet",
+    "Ginetta",
+    "GMC",
+    "Great Wall",
+    "Gumpert",
+    "Hennessey",
+    "Holden",
+    "Honda",
+    "Hummer",
+    "Hyundai",
+    "Infiniti",
+    "Isuzu",
+    "Jaguar",
+    "Jeep",
+    "Joss",
+    "Koenigsegg",
+    "Lada",
+    "Lamborghini",
+    "Lancia",
+    "Land Rover",
+    "Lexus",
+    "Lincoln",
+    "Lotus",
+    "Luxgen",
+    "Mahindra",
+    "Maruti Suzuki",
+    "Maserati",
+    "Maybach",
+    "Mazda",
+    "Mclaren",
+    "Mercedes Benz",
+    "MG",
+    "Mini",
+    "Mitsubishi",
+    "Morgan Motor",
+    "Mosler",
+    "Nissan Motors",
+    "Noble Automotive",
+    "Opel",
+    "Pagani",
+    "Panoz",
+    "Perodua",
+    "Peugeot",
+    "Piaggio",
+    "Pininfarina",
+    "Porsche",
+    "Proton",
+    "Renault",
+    "Reva",
+    "Rimac Automobili",
+    "Rolls Royce",
+    "Ruf Automobile",
+    "Saab",
+    "Scania",
+    "Scion",
+    "Seat",
+    "Shelby",
+    "Skoda",
+    "Smart",
+    "Spyker Cars",
+    "Ssangyong",
+    "SSC",
+    "Subaru",
+    "Suzuki",
+    "Tata",
+    "Tatra",
+    "Terms",
+    "Tesla",
+    "Think",
+    "Toyota",
+    "Tramontana",
+    "Troller",
+    "TVR",
+    "UAZ",
+    "Vandenbrink Design",
+    "Vauxhall",
+    "Vector Motors",
+    "Venturi",
+    "Volkswagen",
+    "Volvo",
+    "Wiesmann",
+    "Zagato",
+    "Zaz",
+    "Zil"
   ];
   String ColorSelect = "White";
   List<String> colors = [
-    "White",
     "Red",
+    "Orange",
+    "Yellow",
+    "Green",
+    "Blue",
+    "Purple",
+    "Pink",
+    "Brown",
+    "Gray",
+    "Black",
+    "White",
+    "Silver"
   ];
   String CountrySelect = "Damascus";
   List<String> Country = [
     "Damascus",
     "Homs",
+    "Sweidaa",
+    "Edlb",
+    "Tartous",
+    "Lattakia",
+    "Daraa",
+    "Hama",
+    "Qunitra",
+    "Rif Dimashq",
+    "Al-Hasakah",
+    "Al-Raqa",
+    "Dir Alzor",
+    "Aleppo"
   ];
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    UserProvider auth = Provider.of<UserProvider>(context);
+    CarProvider carProvider = Provider.of<CarProvider>(context);
 
     return Scaffold(
       body: SafeArea(
@@ -254,41 +393,49 @@ class _Register_CarState extends State<Register_Car> {
                         height: height * 0.06,
                         width: double.infinity,
                         child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: kPrimaryColor),
-                          onPressed: () async {
-                            String text;
-                            if (_globalKey.currentState!.validate()) {
-                              text = await auth.register_car(
-                                  CountrySelect,
-                                  _vehicleIDController.text,
-                                  TypeSelect,
-                                  ColorSelect);
-                              if (text != '') {
-                                Flushbar(
-                                  backgroundColor: Colors.red,
-                                  title: 'Failed',
-                                  message: '$text',
-                                  duration: Duration(seconds: 3),
-                                ).show(context);
-                              } else {
-                                Navigator.pushReplacement(
-                                    context,
-                                    PageTransition(
-                                      type: PageTransitionType.fade,
-                                      child: HomePage(),
-                                      isIos: false,
-                                      duration: Duration(milliseconds: 300),
-                                    ));
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: kPrimaryColor),
+                            onPressed: () async {
+                              if (_globalKey.currentState!.validate()) {
+                                print(ColorSelect);
+                                print(_vehicleIDController.text);
+                                print(CountrySelect);
+                                if (await carProvider.register_car(
+                                    CountrySelect,
+                                    _vehicleIDController.text,
+                                    TypeSelect,
+                                    ColorSelect)) {
+                                  Navigator.pushReplacement(
+                                      context,
+                                      PageTransition(
+                                        type: PageTransitionType.fade,
+                                        child: HomePage(),
+                                        isIos: false,
+                                        duration: Duration(milliseconds: 300),
+                                      ));
+                                } else {
+                                  Flushbar(
+                                    backgroundColor: Colors.red,
+                                    title: 'Failed',
+                                    message: 'You Cant register now',
+                                    duration: Duration(seconds: 3),
+                                  ).show(context);
+                                }
                               }
-                            }
-                          },
-                          child: Text(
-                            "Next",
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        ),
+                            },
+                            child: carProvider.isLoadingregistercar
+                                ? Text(
+                                    "Loading ...",
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  )
+                                : Text(
+                                    "Next",
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  )),
                       ),
                       SizedBox(
                         height: height * 0.03,

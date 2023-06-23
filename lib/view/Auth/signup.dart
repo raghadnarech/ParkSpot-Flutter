@@ -7,7 +7,7 @@ import 'package:park_spot/provider/AuthProvider.dart';
 import 'package:park_spot/view/Auth/login.dart';
 import 'package:park_spot/view/Auth/otp_page.dart';
 import 'package:park_spot/view/Auth/register.dart';
-import 'package:park_spot/view/splash.dart';
+import 'package:park_spot/view/Splash/splash.dart';
 import 'package:park_spot/widget/textinput_auth.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
@@ -77,24 +77,24 @@ class SignupPage extends StatelessWidget {
                               backgroundColor: kPrimaryColor),
                           onPressed: () {
                             if (_globalKey.currentState!.validate()) {
-                              // Navigator.push(
-                              //     context,
-                              //     PageTransition(
-                              //       type: PageTransitionType.fade,
-                              //       child: Register(),
-                              //       isIos: false,
-                              //       duration: Duration(milliseconds: 300),
-                              //     ));
                               Navigator.push(
                                   context,
                                   PageTransition(
                                     type: PageTransitionType.fade,
-                                    child: OtpPage(phone: phoneController.text),
+                                    child:
+                                        Register(phone: phoneController.text),
                                     isIos: false,
                                     duration: Duration(milliseconds: 300),
                                   ));
+                              // Navigator.push(
+                              //     context,
+                              //     PageTransition(
+                              //       type: PageTransitionType.fade,
+                              //       child: OtpPage(phone: phoneController.text),
+                              //       isIos: false,
+                              //       duration: Duration(milliseconds: 300),
+                              //     ));
                             }
-                            ;
                           },
                           child: Text(
                             "Next",

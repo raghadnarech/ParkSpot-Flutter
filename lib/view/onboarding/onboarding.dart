@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:park_spot/const/constants.dart';
 
 import 'package:park_spot/view/Auth/Login.dart';
-import 'package:park_spot/view/splash.dart';
+import 'package:park_spot/view/Splash/splash.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
